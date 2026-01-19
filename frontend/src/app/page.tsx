@@ -50,10 +50,7 @@ export default function HomePage() {
   return (
     <main className="home-container">
       <div className="home-content">
-        <HeroSection
-          title="Todo App"
-          subtitle="Organize your life with our simple, powerful task management application. Stay productive and never miss a deadline."
-        />
+        <HeroSection />
 
         <section className="features-section">
           <h2 className="features-title">What would you like to do?</h2>

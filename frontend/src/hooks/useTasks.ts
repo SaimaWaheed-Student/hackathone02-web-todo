@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { api } from '@/lib/api';
 import type {
   Task,
+  TaskCreate,
+  TaskUpdate,
   TaskListResponse,
   TaskCompleteToggle,
 } from '@/lib/types';
@@ -37,11 +39,11 @@ export function useTasks() {
   }, []);
 
   const createTask = useCallback(
-    async (title: string, description?: string, due_date?: string | null, due_time?: string | null) => {
+    async (task: TaskCreate) => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
       try {
-        const newTask = await api.post<Task>('/tasks', { title, description, due_date, due_time });
+        const newTask = await api.post<Task>('/tasks', task);
         setState((prev) => ({
           tasks: [newTask, ...prev.tasks],
           loading: false,
