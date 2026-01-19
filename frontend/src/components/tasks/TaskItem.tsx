@@ -5,9 +5,9 @@ import type { Task } from '@/lib/types';
 
 interface TaskItemProps {
   task: Task;
-  onToggleComplete: (taskId: string, completed: boolean) => Promise<void>;
-  onUpdate: (taskId: string, title: string, description?: string) => Promise<void>;
-  onDelete: (taskId: string) => Promise<void>;
+  onToggleComplete: (taskId: string, completed: boolean) => Promise<unknown>;
+  onUpdate: (taskId: string, title: string, description?: string, due_date?: string | null, due_time?: string | null) => Promise<unknown>;
+  onDelete: (taskId: string) => Promise<unknown>;
 }
 
 const formatDate = (dateStr: string | null) => {

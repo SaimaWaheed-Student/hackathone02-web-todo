@@ -28,7 +28,10 @@ export default function NewTaskPage() {
     }
 
     try {
-      await createTask(title.trim(), description.trim() || undefined);
+      await createTask({
+        title: title.trim(),
+        description: description.trim() || null,
+      });
       router.push('/tasks');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create task');

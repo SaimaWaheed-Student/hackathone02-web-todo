@@ -6,7 +6,7 @@ import { TimePicker } from '@/components/ui/TimePicker';
 import type { TaskCreate } from '@/lib/types';
 
 interface TaskFormProps {
-  onSubmit: (task: TaskCreate) => Promise<void>;
+  onSubmit: (task: TaskCreate) => Promise<unknown>;
   loading?: boolean;
   initialValues?: {
     title?: string;
