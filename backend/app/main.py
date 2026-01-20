@@ -33,6 +33,8 @@ app.add_middleware(
         "http://localhost:3001",
         "http://localhost:3002",
         "http://127.0.0.1:3000",
+        # Vercel frontend
+        "https://frontend-delta-lime-66.vercel.app",
         # Hugging Face Spaces domains
         "https://huggingface.co",
         "https://*.hf.space",
@@ -41,7 +43,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_origin_regex=r"https://.*\.hf\.space",
+    allow_origin_regex=r"https://.*\.(hf\.space|vercel\.app)",
 )
 
 
