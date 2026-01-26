@@ -15,12 +15,23 @@ export function MessageItem({ message }: MessageItemProps) {
     return null;
   }
 
+  // Check if message contains action confirmation (task operations)
+  const isActionMessage = !isUser && (
+    message.content.toLowerCase().includes('created') ||
+    message.content.toLowerCase().includes('completed') ||
+    message.content.toLowerCase().includes('deleted') ||
+    message.content.toLowerCase().includes('updated') ||
+    message.content.toLowerCase().includes('marked as done')
+  );
+
   return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fadeInUp`}>
       {/* Avatar */}
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-          isUser ? 'bg-blue-600' : 'bg-gray-900'
+        className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
+          isUser
+            ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+            : 'bg-gradient-to-br from-indigo-500 to-purple-600'
         }`}
       >
         {isUser ? (
@@ -57,21 +68,27 @@ export function MessageItem({ message }: MessageItemProps) {
       </div>
 
       {/* Message content */}
-      <div className={`flex flex-col gap-1 max-w-[75%] ${isUser ? 'items-end' : 'items-start'}`}>
-        {/* Sender name */}
-        <span className="text-xs font-medium text-gray-500 px-1">
-          {isUser ? 'You' : 'Assistant'}
-        </span>
-
+      <div className={`flex flex-col gap-1.5 max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
         {/* Message bubble */}
         <div
-          className={`rounded-2xl px-4 py-2.5 ${
+          className={`rounded-2xl px-4 py-3 ${
             isUser
-              ? 'bg-blue-600 text-white rounded-tr-md'
-              : 'bg-white text-gray-800 rounded-tl-md shadow-sm border border-gray-100'
+              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-md shadow-sm shadow-blue-200'
+              : isActionMessage
+                ? 'bg-emerald-50 text-emerald-800 rounded-tl-md border border-emerald-100'
+                : 'bg-white text-gray-700 rounded-tl-md shadow-sm border border-gray-100'
           }`}
         >
-          <p className="text-[14px] leading-relaxed whitespace-pre-wrap break-words">
+          {/* Action indicator */}
+          {isActionMessage && (
+            <div className="flex items-center gap-1.5 mb-1.5 text-emerald-600">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+              <span className="text-xs font-medium">Action completed</span>
+            </div>
+          )}
+          <p className={`text-[14px] leading-relaxed whitespace-pre-wrap break-words ${isUser ? 'text-white' : ''}`}>
             {message.content}
           </p>
         </div>
@@ -81,6 +98,22 @@ export function MessageItem({ message }: MessageItemProps) {
           {formatTime(message.created_at)}
         </span>
       </div>
+
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 0.25s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

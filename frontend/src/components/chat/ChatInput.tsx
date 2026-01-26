@@ -59,13 +59,13 @@ export function ChatInput({
   const showCharCount = charCount > maxLength * 0.8;
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-white">
       {/* Input container with focus ring */}
       <div
-        className={`relative flex items-end gap-2 p-2 rounded-2xl border-2 transition-all duration-200 ${
+        className={`relative flex items-end gap-3 p-2 pl-4 rounded-2xl border transition-all duration-200 ${
           isFocused
-            ? 'border-purple-400 bg-white shadow-lg shadow-purple-100'
-            : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+            ? 'border-indigo-300 bg-white shadow-lg shadow-indigo-50 ring-2 ring-indigo-100'
+            : 'border-gray-200 bg-slate-50 hover:border-gray-300 hover:bg-white'
         } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
       >
         {/* Textarea */}
@@ -79,7 +79,7 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled || isLoading}
           rows={1}
-          className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-800 placeholder-gray-400 py-2 px-2 min-h-[40px] max-h-[120px]"
+          className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-800 placeholder-gray-400 py-2.5 min-h-[44px] max-h-[120px]"
           aria-label="Chat message input"
         />
 
@@ -87,10 +87,10 @@ export function ChatInput({
         <button
           onClick={handleSubmit}
           disabled={isButtonDisabled}
-          className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+          className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 ${
             isButtonDisabled
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-purple-200 hover:scale-105 active:scale-95'
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-200 hover:scale-105 active:scale-95'
           }`}
           aria-label="Send message"
         >
@@ -129,13 +129,13 @@ export function ChatInput({
       </div>
 
       {/* Character count and hints */}
-      <div className="flex items-center justify-between mt-2 px-2">
-        <span className="text-[10px] text-gray-400">
-          Press Enter to send, Shift+Enter for new line
+      <div className="flex items-center justify-between mt-2.5 px-1">
+        <span className="text-[11px] text-gray-400">
+          <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Enter</kbd> to send
         </span>
         {showCharCount && (
           <span
-            className={`text-[10px] font-medium ${
+            className={`text-[11px] font-medium ${
               charCount >= maxLength ? 'text-red-500' : 'text-gray-400'
             }`}
           >
