@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import create_db_and_tables
-from app.routers import auth, tasks
+from app.routers import auth, tasks, chat
 
 settings = get_settings()
 
@@ -56,3 +56,4 @@ async def health_check():
 # Include routers
 app.include_router(auth.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")

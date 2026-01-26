@@ -1,10 +1,11 @@
 from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 import uuid
 
 if TYPE_CHECKING:
     from app.models.task import Task
+    from app.models.conversation import Conversation
 
 
 class User(SQLModel, table=True):
@@ -17,3 +18,6 @@ class User(SQLModel, table=True):
 
     # Relationship to tasks
     tasks: List["Task"] = Relationship(back_populates="user")
+
+    # Relationship to conversation (one-to-one)
+    conversation: Optional["Conversation"] = Relationship(back_populates="user")

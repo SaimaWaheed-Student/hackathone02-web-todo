@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     port: int = 8000
     debug: bool = False
 
+    # OpenRouter Configuration (Phase 3 - AI Chatbot)
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_model: str = "meta-llama/llama-3.3-70b-instruct:free"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

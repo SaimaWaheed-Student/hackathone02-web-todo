@@ -6,6 +6,13 @@ from app.schemas.task import (
     TaskResponse,
     TaskListResponse,
 )
+from app.schemas.chat import (
+    ChatRequest,
+    ChatResponse,
+    ToolCallResult,
+    MessageResponse,
+    ChatHistoryResponse,
+)
 
 __all__ = [
     "UserCreate",
@@ -17,4 +24,9 @@ __all__ = [
     "TaskCompleteToggle",
     "TaskResponse",
     "TaskListResponse",
+    "ChatRequest",
+    "ChatResponse",
+    "ToolCallResult",
+    "MessageResponse",
+    "ChatHistoryResponse",
 ]
