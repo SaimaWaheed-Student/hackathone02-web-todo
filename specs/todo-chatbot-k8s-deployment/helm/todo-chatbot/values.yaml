@@ -1,0 +1,105 @@
+# Default values for todo-chatbot
+
+# Global configurations
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Frontend configuration
+frontend:
+  replicaCount: 1
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 7860
+  resources:
+    limits:
+      cpu: 256m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  env:
+    - name: NEXT_PUBLIC_API_URL
+      value: "http://todo-chatbot-backend:7860"
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Backend configuration
+backend:
+  replicaCount: 1
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 7860
+  resources:
+    limits:
+      cpu: 512m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  env: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Database configuration
+database:
+  enabled: true
+  postgresql:
+    auth:
+      postgresPassword: "postgrespassword"
+      database: "todo_db"
+      username: "todo_user"
+      password: "todopassword"
+    architecture: standalone
+    primary:
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClass: ""
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 200m
+          memory: 256Mi
+    service:
+      ports:
+        postgresql: 5432
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: todo.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# Service account configuration
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# AI API configuration
+openrouter:
+  apiKey: ""
+
+# Application configuration
+app:
+  jwtSecretKey: ""

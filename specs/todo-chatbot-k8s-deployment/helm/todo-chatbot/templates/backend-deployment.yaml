@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todo-chatbot.fullname" . }}-backend
+  labels:
+    {{- include "todo-chatbot.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "todo-chatbot.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "todo-chatbot.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      initContainers:
+      - name: db-init
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        - |
+          python -c "
+          import os
+          import time
+          import logging
+          from sqlalchemy.exc import OperationalError
+
+          # Import after setting up environment
+          from app.config import get_settings
+          from app.database import get_engine, create_db_and_tables
+
+          logging.basicConfig(level=logging.INFO)
+          logger = logging.getLogger(__name__)
+
+          settings = get_settings()
+          logger.info(f'Connecting to database for initialization: {settings.database_url.replace(settings.database_url.split(\"@\")[0].split(\"://\")[1], \"***:***\")}@{settings.database_url.split(\"@\")[1] if \"@\" in settings.database_url else settings.database_url}')
+
+          max_retries = 10
+          retry_delay = 5
+
+          for attempt in range(max_retries):
+              try:
+                  logger.info(f'Attempt {attempt + 1}/{max_retries} to connect and create tables')
+                  create_db_and_tables()
+                  logger.info('Database initialization completed successfully!')
+                  break
+              except OperationalError as e:
+                  logger.warning(f'Database operation failed (attempt {attempt + 1}/{max_retries}): {e}')
+                  if attempt < max_retries - 1:
+                      time.sleep(retry_delay)
+                  else:
+                      logger.error('Failed to initialize database after all retries')
+                      raise
+              except Exception as e:
+                  logger.error(f'Unexpected error during database initialization: {e}')
+                  raise
+          print('Init container completed successfully')
+          "
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-db-secret
+              key: url
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-app-secret
+              key: jwt_secret_key
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-ai-secret
+              key: openrouter_api_key
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+      containers:
+      - name: backend
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+        - containerPort: 7860
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-db-secret
+              key: url
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-ai-secret
+              key: openrouter_api_key
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-app-secret
+              key: jwt_secret_key
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 7860
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 7860
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todo-chatbot.fullname" . }}-backend
+  labels:
+    {{- include "todo-chatbot.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+  - port: {{ .Values.backend.service.port }}
+    targetPort: 7860
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "todo-chatbot.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
