@@ -171,6 +171,7 @@ export function DatePicker({
         </div>
       )}
 
+      {/* T047 - Enhanced DatePicker styling */}
       <style jsx>{`
         .date-picker {
           position: relative;
@@ -181,44 +182,62 @@ export function DatePicker({
           align-items: center;
           gap: var(--spacing-sm);
           width: 100%;
-          padding: 0.75rem;
+          padding: var(--spacing-md);
+          height: var(--input-height);
           border: 1px solid var(--border);
           border-radius: var(--radius-md);
           background: var(--background);
           cursor: pointer;
           font-size: var(--font-size-base);
           color: var(--muted);
-          transition: all var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .date-picker-trigger:hover:not(:disabled) {
           border-color: var(--primary);
+          background: var(--bg-secondary);
         }
         .date-picker-trigger:focus {
           outline: none;
           border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+          box-shadow: var(--shadow-input-focus);
         }
         .date-picker-trigger.has-value {
           color: var(--foreground);
         }
         .date-picker-trigger:disabled {
-          opacity: 0.6;
+          opacity: var(--opacity-disabled);
           cursor: not-allowed;
+          background: var(--bg-secondary);
         }
         .date-picker-trigger span {
           flex: 1;
           text-align: left;
         }
+        .date-picker-trigger svg {
+          color: var(--muted);
+          transition: color var(--transition-fast);
+        }
+        .date-picker-trigger:hover svg {
+          color: var(--primary);
+        }
         .clear-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
           padding: 0;
           border: none;
-          background: none;
+          background: var(--bg-tertiary);
+          border-radius: var(--radius-full);
           cursor: pointer;
           color: var(--muted);
-          font-size: 1.25rem;
+          font-size: 14px;
           line-height: 1;
+          transition: all var(--transition-fast);
         }
         .clear-btn:hover {
+          background: var(--error-light);
           color: var(--error);
         }
         .calendar-dropdown {
@@ -230,30 +249,51 @@ export function DatePicker({
           padding: var(--spacing-md);
           background: var(--background);
           border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          box-shadow: var(--shadow-lg);
-          z-index: 100;
+          border-radius: var(--radius-xl);
+          box-shadow: var(--shadow-modal);
+          z-index: var(--z-dropdown);
+          animation: dropdownIn 0.2s var(--ease-out-expo);
+        }
+        @keyframes dropdownIn {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .calendar-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           margin-bottom: var(--spacing-md);
+          padding-bottom: var(--spacing-sm);
+          border-bottom: 1px solid var(--border);
         }
         .nav-btn {
-          padding: var(--spacing-xs) var(--spacing-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          padding: 0;
           border: none;
           background: none;
           cursor: pointer;
           font-size: 1.25rem;
           color: var(--foreground);
-          border-radius: var(--radius-sm);
+          border-radius: var(--radius-md);
+          transition: all var(--transition-fast);
         }
         .nav-btn:hover {
           background: var(--bg-secondary);
+          color: var(--primary);
         }
         .month-year {
           font-weight: var(--font-weight-semibold);
+          color: var(--foreground);
         }
         .calendar-days-header {
           display: grid;
@@ -265,13 +305,14 @@ export function DatePicker({
           text-align: center;
           font-size: var(--font-size-xs);
           color: var(--muted);
-          font-weight: var(--font-weight-medium);
+          font-weight: var(--font-weight-semibold);
           padding: var(--spacing-xs);
+          text-transform: uppercase;
         }
         .calendar-grid {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
-          gap: 2px;
+          gap: 4px;
         }
         .calendar-day {
           aspect-ratio: 1;
@@ -282,18 +323,22 @@ export function DatePicker({
           background: none;
           cursor: pointer;
           font-size: var(--font-size-sm);
-          border-radius: var(--radius-sm);
-          transition: all var(--transition-fast);
+          font-weight: var(--font-weight-medium);
+          border-radius: var(--radius-md);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .calendar-day:not(.empty):not(.disabled):hover {
-          background: var(--bg-secondary);
+          background: var(--primary-light);
+          color: var(--primary);
         }
         .calendar-day.selected {
           background: var(--primary);
           color: white;
+          box-shadow: var(--shadow-button);
         }
         .calendar-day.today:not(.selected) {
-          border: 1px solid var(--primary);
+          background: var(--bg-tertiary);
+          font-weight: var(--font-weight-bold);
         }
         .calendar-day.disabled {
           color: var(--muted-light);

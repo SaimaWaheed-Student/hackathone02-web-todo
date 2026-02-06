@@ -6,6 +6,7 @@ interface MessageItemProps {
   message: ChatMessage;
 }
 
+// T059-T060 - Message bubbles with user/bot gradient distinction
 export function MessageItem({ message }: MessageItemProps) {
   const isUser = message.role === 'user';
   const isTool = message.role === 'tool';
@@ -25,81 +26,49 @@ export function MessageItem({ message }: MessageItemProps) {
   );
 
   return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fadeInUp`}>
+    <div className={`message-row ${isUser ? 'user' : 'bot'}`}>
       {/* Avatar */}
-      <div
-        className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
-          isUser
-            ? 'bg-gradient-to-br from-blue-500 to-blue-600'
-            : 'bg-gradient-to-br from-indigo-500 to-purple-600'
-        }`}
-      >
+      <div className={`message-avatar ${isUser ? 'user' : 'bot'}`}>
         {isUser ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="white"
-            className="w-4 h-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-            />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
         ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="white"
-            className="w-4 h-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
-            />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
           </svg>
         )}
       </div>
 
       {/* Message content */}
-      <div className={`flex flex-col gap-1.5 max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
-        {/* Message bubble */}
-        <div
-          className={`rounded-2xl px-4 py-3 ${
-            isUser
-              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-md shadow-sm shadow-blue-200'
-              : isActionMessage
-                ? 'bg-emerald-50 text-emerald-800 rounded-tl-md border border-emerald-100'
-                : 'bg-white text-gray-700 rounded-tl-md shadow-sm border border-gray-100'
-          }`}
-        >
+      <div className="message-content">
+        {/* T060 - Message bubble with rounded corners */}
+        <div className={`message-bubble ${isUser ? 'user' : isActionMessage ? 'action' : 'bot'}`}>
           {/* Action indicator */}
           {isActionMessage && (
-            <div className="flex items-center gap-1.5 mb-1.5 text-emerald-600">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            <div className="action-indicator">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              <span className="text-xs font-medium">Action completed</span>
+              <span>Action completed</span>
             </div>
           )}
-          <p className={`text-[14px] leading-relaxed whitespace-pre-wrap break-words ${isUser ? 'text-white' : ''}`}>
-            {message.content}
-          </p>
+          <p className="message-text">{message.content}</p>
         </div>
 
         {/* Timestamp */}
-        <span className="text-[10px] text-gray-400 px-1">
-          {formatTime(message.created_at)}
-        </span>
+        <span className="message-time">{formatTime(message.created_at)}</span>
       </div>
 
-      <style jsx global>{`
+      <style jsx>{`
+        .message-row {
+          display: flex;
+          gap: var(--spacing-sm);
+          animation: fadeInUp 0.25s var(--ease-out-expo);
+        }
+        .message-row.user {
+          flex-direction: row-reverse;
+        }
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -110,8 +79,82 @@ export function MessageItem({ message }: MessageItemProps) {
             transform: translateY(0);
           }
         }
-        .animate-fadeInUp {
-          animation: fadeInUp 0.25s ease-out;
+        .message-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: var(--radius-lg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          color: white;
+        }
+        .message-avatar.user {
+          background: var(--gradient-chat-user);
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+        .message-avatar.bot {
+          background: var(--gradient-chat-bot);
+          box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+        .message-content {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          max-width: 80%;
+        }
+        .message-row.user .message-content {
+          align-items: flex-end;
+        }
+        .message-row.bot .message-content {
+          align-items: flex-start;
+        }
+        .message-bubble {
+          padding: var(--spacing-sm) var(--spacing-md);
+          border-radius: var(--radius-xl);
+          font-size: var(--font-size-sm);
+          line-height: var(--line-height-relaxed);
+        }
+        /* T060 - Rounded corners: rounded-tr-md for user, rounded-tl-md for bot */
+        .message-bubble.user {
+          background: var(--gradient-chat-user);
+          color: white;
+          border-top-right-radius: var(--radius-sm);
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+        .message-bubble.bot {
+          background: var(--background);
+          color: var(--foreground);
+          border: 1px solid var(--border);
+          border-top-left-radius: var(--radius-sm);
+        }
+        .message-bubble.action {
+          background: var(--success-light);
+          color: var(--success);
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          border-top-left-radius: var(--radius-sm);
+        }
+        .message-bubble.action .message-text {
+          color: var(--foreground);
+        }
+        .action-indicator {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: var(--spacing-xs);
+          color: var(--success);
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-medium);
+        }
+        .message-text {
+          margin: 0;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+        .message-time {
+          font-size: 10px;
+          color: var(--muted-light);
+          padding: 0 var(--spacing-xs);
         }
       `}</style>
     </div>

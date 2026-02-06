@@ -22,12 +22,13 @@ export function FeatureCard({ icon, title, description }: FeatureCardProps) {
           border-radius: var(--radius-xl);
           border: 1px solid var(--border);
           text-align: center;
-          transition: all var(--transition-normal);
+          transition: all var(--transition-normal) var(--ease-out-expo);
           cursor: default;
+          box-shadow: var(--shadow-card);
         }
         .feature-card:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-lg);
+          transform: translateY(-6px);
+          box-shadow: var(--shadow-card-hover);
           border-color: var(--primary-light);
         }
         .feature-card:focus-within {
@@ -44,6 +45,10 @@ export function FeatureCard({ icon, title, description }: FeatureCardProps) {
           border-radius: var(--radius-lg);
           margin-bottom: var(--spacing-md);
           color: var(--primary);
+          transition: transform var(--transition-normal) var(--ease-spring);
+        }
+        .feature-card:hover .feature-icon {
+          transform: scale(1.08);
         }
         .feature-title {
           font-size: var(--font-size-lg);

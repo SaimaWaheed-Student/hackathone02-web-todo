@@ -59,14 +59,10 @@ export function ChatInput({
   const showCharCount = charCount > maxLength * 0.8;
 
   return (
-    <div className="p-4 bg-white">
+    <div className="chat-input-wrapper">
       {/* Input container with focus ring */}
       <div
-        className={`relative flex items-end gap-3 p-2 pl-4 rounded-2xl border transition-all duration-200 ${
-          isFocused
-            ? 'border-indigo-300 bg-white shadow-lg shadow-indigo-50 ring-2 ring-indigo-100'
-            : 'border-gray-200 bg-slate-50 hover:border-gray-300 hover:bg-white'
-        } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+        className={`chat-input-container ${isFocused ? 'focused' : ''} ${disabled ? 'disabled' : ''}`}
       >
         {/* Textarea */}
         <textarea
@@ -79,7 +75,7 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled || isLoading}
           rows={1}
-          className="flex-1 bg-transparent resize-none outline-none text-sm text-gray-800 placeholder-gray-400 py-2.5 min-h-[44px] max-h-[120px]"
+          className="chat-textarea"
           aria-label="Chat message input"
         />
 
@@ -87,11 +83,7 @@ export function ChatInput({
         <button
           onClick={handleSubmit}
           disabled={isButtonDisabled}
-          className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 ${
-            isButtonDisabled
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-200 hover:scale-105 active:scale-95'
-          }`}
+          className={`chat-send-btn ${isButtonDisabled ? 'disabled' : ''}`}
           aria-label="Send message"
         >
           {isLoading ? (
@@ -129,20 +121,116 @@ export function ChatInput({
       </div>
 
       {/* Character count and hints */}
-      <div className="flex items-center justify-between mt-2.5 px-1">
-        <span className="text-[11px] text-gray-400">
-          <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Enter</kbd> to send
+      <div className="chat-input-hints">
+        <span className="hint-text">
+          <kbd className="hint-kbd">Enter</kbd> to send
         </span>
         {showCharCount && (
-          <span
-            className={`text-[11px] font-medium ${
-              charCount >= maxLength ? 'text-red-500' : 'text-gray-400'
-            }`}
-          >
+          <span className={`char-count ${charCount >= maxLength ? 'limit-reached' : ''}`}>
             {charCount}/{maxLength}
           </span>
         )}
       </div>
+
+      <style jsx>{`
+        .chat-input-wrapper {
+          padding: 16px;
+          background: white;
+        }
+        .chat-input-container {
+          position: relative;
+          display: flex;
+          align-items: flex-end;
+          gap: 12px;
+          padding: 8px 8px 8px 16px;
+          border-radius: 20px;
+          border: 2px solid #e5e7eb;
+          background: #f8fafc;
+          transition: all 0.2s ease;
+        }
+        .chat-input-container:hover {
+          border-color: #d1d5db;
+          background: white;
+        }
+        .chat-input-container.focused {
+          border-color: #818cf8;
+          background: white;
+          box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1), 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+        .chat-input-container.disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        .chat-textarea {
+          flex: 1;
+          background: transparent;
+          resize: none;
+          outline: none;
+          font-size: 14px;
+          color: #1f2937;
+          padding: 10px 0;
+          min-height: 44px;
+          max-height: 120px;
+          line-height: 1.5;
+        }
+        .chat-textarea::placeholder {
+          color: #9ca3af;
+        }
+        .chat-send-btn {
+          flex-shrink: 0;
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          cursor: pointer;
+          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+          color: white;
+          box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+          transition: all 0.2s ease;
+        }
+        .chat-send-btn:hover:not(.disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+        .chat-send-btn:active:not(.disabled) {
+          transform: translateY(0) scale(0.95);
+        }
+        .chat-send-btn.disabled {
+          background: #e5e7eb;
+          color: #9ca3af;
+          box-shadow: none;
+          cursor: not-allowed;
+        }
+        .chat-input-hints {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 10px;
+          padding: 0 4px;
+        }
+        .hint-text {
+          font-size: 11px;
+          color: #9ca3af;
+        }
+        .hint-kbd {
+          padding: 2px 6px;
+          background: #f3f4f6;
+          border-radius: 4px;
+          font-size: 10px;
+          font-family: monospace;
+        }
+        .char-count {
+          font-size: 11px;
+          font-weight: 500;
+          color: #9ca3af;
+        }
+        .char-count.limit-reached {
+          color: #ef4444;
+        }
+      `}</style>
     </div>
   );
 }

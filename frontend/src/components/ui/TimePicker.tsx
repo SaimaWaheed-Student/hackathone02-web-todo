@@ -151,6 +151,7 @@ export function TimePicker({
         </div>
       )}
 
+      {/* T048 - Enhanced TimePicker styling */}
       <style jsx>{`
         .time-picker {
           position: relative;
@@ -161,44 +162,62 @@ export function TimePicker({
           align-items: center;
           gap: var(--spacing-sm);
           width: 100%;
-          padding: 0.75rem;
+          padding: var(--spacing-md);
+          height: var(--input-height);
           border: 1px solid var(--border);
           border-radius: var(--radius-md);
           background: var(--background);
           cursor: pointer;
           font-size: var(--font-size-base);
           color: var(--muted);
-          transition: all var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .time-picker-trigger:hover:not(:disabled) {
           border-color: var(--primary);
+          background: var(--bg-secondary);
         }
         .time-picker-trigger:focus {
           outline: none;
           border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+          box-shadow: var(--shadow-input-focus);
         }
         .time-picker-trigger.has-value {
           color: var(--foreground);
         }
         .time-picker-trigger:disabled {
-          opacity: 0.6;
+          opacity: var(--opacity-disabled);
           cursor: not-allowed;
+          background: var(--bg-secondary);
         }
         .time-picker-trigger span {
           flex: 1;
           text-align: left;
         }
+        .time-picker-trigger svg {
+          color: var(--muted);
+          transition: color var(--transition-fast);
+        }
+        .time-picker-trigger:hover svg {
+          color: var(--primary);
+        }
         .clear-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
           padding: 0;
           border: none;
-          background: none;
+          background: var(--bg-tertiary);
+          border-radius: var(--radius-full);
           cursor: pointer;
           color: var(--muted);
-          font-size: 1.25rem;
+          font-size: 14px;
           line-height: 1;
+          transition: all var(--transition-fast);
         }
         .clear-btn:hover {
+          background: var(--error-light);
           color: var(--error);
         }
         .time-dropdown {
@@ -210,19 +229,33 @@ export function TimePicker({
           padding: var(--spacing-md);
           background: var(--background);
           border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          box-shadow: var(--shadow-lg);
-          z-index: 100;
+          border-radius: var(--radius-xl);
+          box-shadow: var(--shadow-modal);
+          z-index: var(--z-dropdown);
+          animation: dropdownIn 0.2s var(--ease-out-expo);
+        }
+        @keyframes dropdownIn {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .time-section {
           margin-bottom: var(--spacing-md);
         }
+        .time-section:last-of-type {
+          margin-bottom: var(--spacing-lg);
+        }
         .time-section label {
           display: block;
           font-size: var(--font-size-xs);
-          font-weight: var(--font-weight-medium);
+          font-weight: var(--font-weight-semibold);
           color: var(--muted);
-          margin-bottom: var(--spacing-xs);
+          margin-bottom: var(--spacing-sm);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -240,20 +273,23 @@ export function TimePicker({
         .time-option {
           padding: var(--spacing-sm);
           border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
+          border-radius: var(--radius-md);
           background: var(--background);
           cursor: pointer;
           font-size: var(--font-size-sm);
-          transition: all var(--transition-fast);
+          font-weight: var(--font-weight-medium);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .time-option:hover {
           border-color: var(--primary);
-          background: var(--bg-secondary);
+          background: var(--primary-light);
+          color: var(--primary);
         }
         .time-option.selected {
           background: var(--primary);
           color: white;
           border-color: var(--primary);
+          box-shadow: var(--shadow-button);
         }
         .confirm-btn {
           width: 100%;
@@ -263,12 +299,14 @@ export function TimePicker({
           background: var(--primary);
           color: white;
           font-size: var(--font-size-sm);
-          font-weight: var(--font-weight-medium);
+          font-weight: var(--font-weight-semibold);
           cursor: pointer;
-          transition: background var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
+          box-shadow: var(--shadow-button);
         }
         .confirm-btn:hover {
           background: var(--primary-hover);
+          transform: translateY(-1px);
         }
       `}</style>
     </div>

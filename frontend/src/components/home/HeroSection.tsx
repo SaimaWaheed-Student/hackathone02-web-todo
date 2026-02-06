@@ -43,19 +43,29 @@ export function HeroSection() {
         .hero {
           text-align: center;
           padding: var(--spacing-3xl) var(--spacing-md);
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--gradient-primary);
           border-radius: var(--radius-xl);
           margin-bottom: var(--spacing-2xl);
-          animation: fadeIn 0.6s ease-out;
+          animation: heroFadeIn 0.6s var(--ease-out-expo);
+          position: relative;
+          overflow: hidden;
         }
-        @keyframes fadeIn {
+        .hero::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                      radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+          pointer-events: none;
+        }
+        @keyframes heroFadeIn {
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(20px) scale(0.98);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
         }
         .hero-content {
@@ -96,12 +106,17 @@ export function HeroSection() {
           font-weight: var(--font-weight-semibold);
           text-decoration: none;
           border-radius: var(--radius-lg);
-          transition: all var(--transition-normal);
-          box-shadow: var(--shadow-md);
+          transition: all var(--transition-normal) var(--ease-out-expo);
+          box-shadow: var(--shadow-lg);
+          position: relative;
+          z-index: 1;
         }
         .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-lg);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.25);
+        }
+        .btn-primary:active {
+          transform: translateY(-1px);
         }
         .btn-secondary {
           display: inline-flex;

@@ -92,20 +92,24 @@ export function FeaturesSection() {
 
       <style jsx>{`
         .features-section {
-          padding: var(--spacing-2xl) 0;
+          padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+          border-top: 1px solid var(--border);
         }
         .features-heading {
-          font-size: var(--font-size-2xl);
+          font-size: var(--font-size-xl);
           font-weight: var(--font-weight-bold);
           color: var(--foreground);
           text-align: center;
-          margin-bottom: var(--spacing-sm);
+          margin-bottom: var(--spacing-xs);
         }
         .features-subheading {
-          font-size: var(--font-size-lg);
+          font-size: var(--font-size-base);
           color: var(--muted);
           text-align: center;
           margin-bottom: var(--spacing-2xl);
+          max-width: 500px;
+          margin-left: auto;
+          margin-right: auto;
         }
         .features-grid {
           display: grid;
@@ -115,6 +119,12 @@ export function FeaturesSection() {
         @media (min-width: 640px) {
           .features-grid {
             grid-template-columns: repeat(2, 1fr);
+          }
+          .features-heading {
+            font-size: var(--font-size-2xl);
+          }
+          .features-subheading {
+            font-size: var(--font-size-lg);
           }
         }
         @media (min-width: 1024px) {

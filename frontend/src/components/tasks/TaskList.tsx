@@ -1,6 +1,7 @@
 'use client';
 
 import { TaskItem } from './TaskItem';
+import { EmptyState } from '@/components/ui/EmptyState';
 import type { Task } from '@/lib/types';
 
 interface TaskListProps {
@@ -136,10 +137,11 @@ export function TaskList({
     );
   }
 
+  // T043 - Use EmptyState component for empty task list
   if (tasks.length === 0) {
     return (
-      <div className="task-list-empty">
-        <div className="empty-icon">
+      <EmptyState
+        icon={
           <svg
             width="48"
             height="48"
@@ -155,53 +157,49 @@ export function TaskList({
             <line x1="12" y1="11" x2="12" y2="17" />
             <line x1="9" y1="14" x2="15" y2="14" />
           </svg>
-        </div>
-        <p className="empty-title">No tasks yet!</p>
-        <p className="empty-hint">Create your first task to get started.</p>
-        <style jsx>{`
-          .task-list-empty {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--muted);
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          }
-          .empty-icon {
-            margin-bottom: 1rem;
-            opacity: 0.5;
-          }
-          .empty-title {
-            font-weight: 500;
-            color: var(--foreground);
-            margin: 0 0 0.25rem 0;
-          }
-          .empty-hint {
-            font-size: 0.875rem;
-            margin: 0;
-          }
-        `}</style>
-      </div>
+        }
+        title="No tasks yet!"
+        description="Create your first task to get started and stay organized."
+      />
     );
   }
 
+  // T044 - Enhanced TaskList container with consistent spacing
   return (
     <div className="task-list">
-      {tasks.map((task) => (
-        <TaskItem
+      {tasks.map((task, index) => (
+        <div
           key={task.id}
-          task={task}
-          onToggleComplete={onToggleComplete}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-        />
+          className="task-item-wrapper"
+          style={{ animationDelay: `${index * 50}ms` }}
+        >
+          <TaskItem
+            task={task}
+            onToggleComplete={onToggleComplete}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+          />
+        </div>
       ))}
 
       <style jsx>{`
         .task-list {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-md);
+          gap: var(--spacing-lg);
+        }
+        .task-item-wrapper {
+          animation: slideInUp 0.3s var(--ease-out-expo) both;
+        }
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>

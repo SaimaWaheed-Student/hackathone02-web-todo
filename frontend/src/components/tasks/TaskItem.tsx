@@ -10,17 +10,32 @@ interface TaskItemProps {
   onDelete: (taskId: string) => Promise<unknown>;
 }
 
-const formatDate = (dateStr: string | null) => {
+// T036 - Date formatting helper
+const formatTaskDate = (dateStr: string | null): string | null => {
   if (!dateStr) return null;
   const date = new Date(dateStr);
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // Check if it's today
+  if (date.toDateString() === today.toDateString()) {
+    return 'Today';
+  }
+  // Check if it's tomorrow
+  if (date.toDateString() === tomorrow.toDateString()) {
+    return 'Tomorrow';
+  }
+  // Otherwise return formatted date
   return date.toLocaleDateString('en-US', {
+    weekday: 'short',
     month: 'short',
     day: 'numeric',
-    year: 'numeric',
   });
 };
 
-const formatTime = (timeStr: string | null) => {
+// T037 - Time formatting helper
+const formatTaskTime = (timeStr: string | null): string | null => {
   if (!timeStr) return null;
   const [hours, minutes] = timeStr.split(':').map(Number);
   const isPM = hours >= 12;
@@ -191,22 +206,38 @@ export function TaskItem({
     <div className={`task-card ${task.completed ? 'completed' : ''}`}>
       <div className="card-header">
         <span className={`status-badge ${task.completed ? 'done' : 'pending'}`}>
-          {task.completed ? 'Completed' : 'Pending'}
+          {task.completed ? (
+            <>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Completed
+            </>
+          ) : 'Pending'}
         </span>
-        {(task.due_date || task.due_time) && (
-          <div className="due-info">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <span>
-              {formatDate(task.due_date)}
-              {task.due_time && ` at ${formatTime(task.due_time)}`}
-            </span>
-          </div>
-        )}
+        {/* T038 - Date and time with icons */}
+        <div className="due-info-container">
+          {task.due_date && (
+            <div className="due-info">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>{formatTaskDate(task.due_date)}</span>
+            </div>
+          )}
+          {task.due_time && (
+            <div className="due-info">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>{formatTaskTime(task.due_time)}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="card-body">
@@ -282,25 +313,50 @@ export function TaskItem({
       )}
 
       <style jsx>{`
+        /* T042 - Enhanced task card with hover effects */
         .task-card {
           background: var(--background);
           padding: var(--spacing-lg);
-          border-radius: var(--radius-lg);
+          border-radius: var(--radius-xl);
           border: 1px solid var(--border);
-          box-shadow: var(--shadow-sm);
-          transition: all var(--transition-normal);
+          box-shadow: var(--shadow-card);
+          transition: all var(--transition-normal) var(--ease-out-expo);
           position: relative;
         }
         .task-card:hover {
-          box-shadow: var(--shadow-md);
-          transform: translateY(-2px);
+          box-shadow: var(--shadow-card-hover);
+          transform: translateY(-4px);
+          border-color: var(--primary-light);
         }
+        /* T040 - Completed task state styling */
         .task-card.completed {
           background: var(--bg-secondary);
+          opacity: var(--opacity-completed);
+          border-color: var(--success-light);
+        }
+        .task-card.completed:hover {
+          opacity: 1;
+          border-color: var(--success);
         }
         .task-card.completed .task-title {
           text-decoration: line-through;
           color: var(--muted);
+          position: relative;
+        }
+        /* T041 - Strikethrough animation */
+        .task-card.completed .task-title::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          width: 100%;
+          height: 2px;
+          background: var(--muted);
+          animation: strikethrough 0.3s var(--ease-out-expo) forwards;
+        }
+        @keyframes strikethrough {
+          from { width: 0; }
+          to { width: 100%; }
         }
         .task-card.completed .task-description {
           color: var(--muted-light);
@@ -308,12 +364,16 @@ export function TaskItem({
         .card-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           margin-bottom: var(--spacing-md);
           flex-wrap: wrap;
           gap: var(--spacing-sm);
         }
+        /* T040 - Status badge with checkmark */
         .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
           font-size: var(--font-size-xs);
           font-weight: var(--font-weight-semibold);
           padding: var(--spacing-xs) var(--spacing-sm);
@@ -329,12 +389,33 @@ export function TaskItem({
           background: var(--success-light);
           color: var(--success);
         }
+        /* T041 - Checkmark animation */
+        .status-badge.done svg {
+          animation: checkmark 0.4s var(--ease-spring) forwards;
+        }
+        @keyframes checkmark {
+          0% { transform: scale(0); opacity: 0; }
+          50% { transform: scale(1.3); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        /* T038 - Date/time info container */
+        .due-info-container {
+          display: flex;
+          gap: var(--spacing-md);
+          flex-wrap: wrap;
+        }
         .due-info {
           display: flex;
           align-items: center;
           gap: var(--spacing-xs);
           font-size: var(--font-size-xs);
           color: var(--muted);
+          background: var(--bg-secondary);
+          padding: 4px var(--spacing-sm);
+          border-radius: var(--radius-md);
+        }
+        .due-info svg {
+          color: var(--muted-light);
         }
         .card-body {
           margin-bottom: var(--spacing-lg);
@@ -345,6 +426,7 @@ export function TaskItem({
           color: var(--foreground);
           margin: 0 0 var(--spacing-sm);
           word-break: break-word;
+          line-height: var(--line-height-tight);
         }
         .task-description {
           font-size: var(--font-size-sm);
@@ -359,7 +441,10 @@ export function TaskItem({
           align-items: center;
           flex-wrap: wrap;
           gap: var(--spacing-md);
+          padding-top: var(--spacing-md);
+          border-top: 1px solid var(--border);
         }
+        /* T039 - Prominent Mark as Complete button */
         .btn-complete {
           display: inline-flex;
           align-items: center;
@@ -370,12 +455,18 @@ export function TaskItem({
           border: none;
           border-radius: var(--radius-md);
           font-size: var(--font-size-sm);
-          font-weight: var(--font-weight-medium);
+          font-weight: var(--font-weight-semibold);
           cursor: pointer;
-          transition: all var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
+          box-shadow: var(--shadow-button);
         }
         .btn-complete:hover:not(:disabled) {
           background: var(--primary-hover);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        }
+        .btn-complete:active:not(:disabled) {
+          transform: translateY(0);
         }
         .btn-complete:disabled {
           opacity: 0.7;
@@ -383,10 +474,13 @@ export function TaskItem({
         }
         .btn-complete.completed {
           background: var(--success);
+          box-shadow: var(--shadow-button-success);
           cursor: default;
         }
         .btn-complete.completed:hover {
           background: var(--success);
+          transform: none;
+          box-shadow: var(--shadow-button-success);
         }
         .loading-spinner {
           width: 16px;
@@ -409,13 +503,13 @@ export function TaskItem({
           display: inline-flex;
           align-items: center;
           gap: var(--spacing-xs);
-          padding: var(--spacing-xs) var(--spacing-sm);
+          padding: var(--spacing-sm) var(--spacing-md);
           border: none;
           border-radius: var(--radius-md);
           font-size: var(--font-size-xs);
           font-weight: var(--font-weight-medium);
           cursor: pointer;
-          transition: all var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .btn-edit {
           background: var(--bg-tertiary);
@@ -423,6 +517,7 @@ export function TaskItem({
         }
         .btn-edit:hover {
           background: var(--border);
+          transform: translateY(-1px);
         }
         .btn-delete {
           background: var(--error-light);
@@ -430,6 +525,7 @@ export function TaskItem({
         }
         .btn-delete:hover {
           background: #fee2e2;
+          transform: translateY(-1px);
         }
         .delete-overlay {
           position: absolute;

@@ -87,3 +87,29 @@ export function useAuthContext(): AuthContextType {
   }
   return context;
 }
+
+/**
+ * Hook for guest-only pages (signin, signup)
+ * Redirects authenticated users to the specified URL or home
+ * @param redirectTo - URL to redirect authenticated users (default: '/')
+ * @returns Object with isLoading and shouldRender states
+ */
+export function useGuestRedirect(redirectTo: string = '/'): {
+  isLoading: boolean;
+  shouldRender: boolean;
+} {
+  const { isAuthenticated, isLoading } = useAuthContext();
+
+  // If loading, don't render yet
+  if (isLoading) {
+    return { isLoading: true, shouldRender: false };
+  }
+
+  // If authenticated, shouldn't render (page will handle redirect)
+  if (isAuthenticated) {
+    return { isLoading: false, shouldRender: false };
+  }
+
+  // Not authenticated - safe to render guest content
+  return { isLoading: false, shouldRender: true };
+}

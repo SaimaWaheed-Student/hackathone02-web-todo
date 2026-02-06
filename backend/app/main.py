@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,8 +13,8 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler for startup/shutdown events."""
-    # Startup: Create database tables
-    create_db_and_tables()
+    # Startup: Database initialization is done by init-db job
+    # Just ensure we can connect to the database
     yield
     # Shutdown: cleanup if needed
 
@@ -33,6 +34,11 @@ app.add_middleware(
         "http://localhost:3001",
         "http://localhost:3002",
         "http://127.0.0.1:3000",
+        # Docker Compose / K8s port-forward origins
+        "http://localhost:7860",
+        "http://localhost:7861",
+        "http://localhost:7862",
+        "http://localhost:7863",
         # Vercel frontend
         "https://frontend-delta-lime-66.vercel.app",
         # Hugging Face Spaces domains
@@ -50,7 +56,7 @@ app.add_middleware(
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy"}
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
 
 # Include routers
