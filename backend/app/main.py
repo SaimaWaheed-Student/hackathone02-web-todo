@@ -13,8 +13,8 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler for startup/shutdown events."""
-    # Startup: Database initialization is done by init-db job
-    # Just ensure we can connect to the database
+    # Startup: Create database tables if they don't exist
+    create_db_and_tables()
     yield
     # Shutdown: cleanup if needed
 
