@@ -19,6 +19,14 @@ COPY . .
 ARG NEXT_PUBLIC_API_URL=http://localhost:7861/api
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
+# Increase Node memory and disable telemetry for Docker builds
+ENV NODE_OPTIONS="--max_old_space_size=2048"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PRIVATE_STANDALONE=true
+
+# Increase static generation timeout (default 60s is too low for resource-constrained Docker builds)
+ENV NEXT_STATIC_GENERATION_TIMEOUT=300
+
 RUN npm run build
 
 # Production image, copy all the files and run next

@@ -1,0 +1,70 @@
+# Staging environment values for Todo Chatbot
+
+# Frontend configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: todo-frontend
+    tag: staging-latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 7860
+  resources:
+    limits:
+      cpu: 400m
+      memory: 300Mi
+    requests:
+      cpu: 150m
+      memory: 200Mi
+
+# Backend configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    tag: staging-latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 7860
+  resources:
+    limits:
+      cpu: 600m
+      memory: 600Mi
+    requests:
+      cpu: 250m
+      memory: 300Mi
+
+# Database configuration
+database:
+  enabled: true
+  postgresql:
+    auth:
+      postgresPassword: "staging-postgres-password"
+      database: "todo_staging_db"
+      username: "todo_staging_user"
+      password: "staging-todo-password"
+    primary:
+      persistence:
+        enabled: true
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 200m
+          memory: 256Mi
+
+# Ingress disabled for Minikube local deployment
+ingress:
+  enabled: false
+
+# OpenRouter API configuration (staging)
+openrouter:
+  apiKey: ""
+
+# Application configuration
+app:
+  jwtSecretKey: ""
