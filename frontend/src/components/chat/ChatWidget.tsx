@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useChat } from '@/hooks/useChat';
 import { ChatButton } from './ChatButton';
-import { ChatWindow } from './ChatWindow';
+import { ChatPanel } from './ChatPanel';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 
@@ -67,30 +67,30 @@ export function ChatWidget({ className }: ChatWidgetProps) {
     return null;
   }
 
+  // T064-T065 - Integrated ChatPanel with auth check
   return (
     <div className={className}>
-      {!isOpen ? (
-        <ChatButton onClick={handleOpen} />
-      ) : (
-        <ChatWindow
-          isOpen={isOpen}
-          onClose={handleClose}
-          onClearHistory={messages.length > 0 ? handleClearHistory : undefined}
-          footer={
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-              disabled={isLoading}
-            />
-          }
-        >
-          <MessageList
-            messages={messages}
+      {/* T065 - Chat button only visible for authenticated users */}
+      <ChatButton onClick={handleOpen} isOpen={isOpen} />
+
+      <ChatPanel
+        isOpen={isOpen}
+        onClose={handleClose}
+        onClearHistory={messages.length > 0 ? handleClearHistory : undefined}
+        footer={
+          <ChatInput
+            onSendMessage={handleSendMessage}
             isLoading={isLoading}
-            error={error}
+            disabled={isLoading}
           />
-        </ChatWindow>
-      )}
+        }
+      >
+        <MessageList
+          messages={messages}
+          isLoading={isLoading}
+          error={error}
+        />
+      </ChatPanel>
     </div>
   );
 }

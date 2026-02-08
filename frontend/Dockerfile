@@ -14,8 +14,18 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set the API URL for Hugging Face backend
-ENV NEXT_PUBLIC_API_URL=https://saimawaheedsaima5-todo-backend-api.hf.space/api
+# Set the default API URL (override via --build-arg NEXT_PUBLIC_API_URL=...)
+# NEXT_PUBLIC_* vars are baked at build time in Next.js
+ARG NEXT_PUBLIC_API_URL=http://localhost:7861/api
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+# Increase Node memory and disable telemetry for Docker builds
+ENV NODE_OPTIONS="--max_old_space_size=2048"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PRIVATE_STANDALONE=true
+
+# Increase static generation timeout (default 60s is too low for resource-constrained Docker builds)
+ENV NEXT_STATIC_GENERATION_TIMEOUT=300
 
 RUN npm run build
 
@@ -38,5 +48,9 @@ EXPOSE 7860
 
 ENV PORT=7860
 ENV HOSTNAME="0.0.0.0"
+
+# Add health check for Kubernetes
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget --quiet --tries=1 -O /dev/null http://127.0.0.1:7860 || exit 1
 
 CMD ["node", "server.js"]

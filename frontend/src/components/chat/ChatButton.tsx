@@ -2,37 +2,111 @@
 
 interface ChatButtonProps {
   onClick: () => void;
-  className?: string;
+  isOpen?: boolean;
 }
 
-export function ChatButton({ onClick, className }: ChatButtonProps) {
+// T054-T055 - Enhanced floating chatbot button with pulse animation
+export function ChatButton({ onClick, isOpen = false }: ChatButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`group fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-2xl shadow-lg shadow-indigo-300/50 hover:shadow-xl hover:shadow-indigo-400/50 flex items-center justify-center z-[1000] transition-all duration-300 hover:scale-105 active:scale-95 ${className || ''}`}
-      aria-label="Open chat assistant"
+      className="chat-button"
+      aria-label={isOpen ? 'Close chat assistant' : 'Open chat assistant'}
+      aria-expanded={isOpen}
     >
-      {/* Chat icon */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-6 h-6 transition-transform duration-300 group-hover:scale-110"
-      >
-        <path
+      <span className="chat-button-icon">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-        />
-      </svg>
-
-      {/* Notification dot with pulse animation */}
-      <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white" />
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
       </span>
+
+      {/* T055 - Pulse animation notification dot */}
+      <span className="notification-dot">
+        <span className="notification-ping" />
+        <span className="notification-badge" />
+      </span>
+
+      <style jsx>{`
+        .chat-button {
+          position: fixed;
+          bottom: var(--spacing-xl);
+          right: var(--spacing-xl);
+          width: 60px;
+          height: 60px;
+          background: var(--gradient-chat-bot);
+          color: white;
+          border: none;
+          border-radius: var(--radius-xl);
+          box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: var(--z-chat);
+          transition: all var(--transition-normal) var(--ease-out-expo);
+        }
+        .chat-button:hover {
+          transform: scale(1.08) translateY(-2px);
+          box-shadow: 0 12px 32px -4px rgba(99, 102, 241, 0.5);
+        }
+        .chat-button:active {
+          transform: scale(0.98);
+        }
+        .chat-button-icon {
+          display: flex;
+          transition: transform var(--transition-normal) var(--ease-spring);
+        }
+        .chat-button:hover .chat-button-icon {
+          transform: scale(1.1);
+        }
+        .notification-dot {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          display: flex;
+          width: 14px;
+          height: 14px;
+        }
+        .notification-ping {
+          position: absolute;
+          inset: 0;
+          border-radius: var(--radius-full);
+          background: var(--success);
+          opacity: 0.75;
+          animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes ping {
+          75%, 100% {
+            transform: scale(2);
+            opacity: 0;
+          }
+        }
+        .notification-badge {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          border-radius: var(--radius-full);
+          background: var(--success);
+          border: 2px solid white;
+        }
+        @media (max-width: 639px) {
+          .chat-button {
+            bottom: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 56px;
+            height: 56px;
+          }
+        }
+      `}</style>
     </button>
   );
 }

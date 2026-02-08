@@ -43,6 +43,9 @@ export function Header() {
               <Link href="/tasks" className="nav-link">
                 My Tasks
               </Link>
+              <Link href="/chat" className="nav-link">
+                AI Chat
+              </Link>
               <button onClick={handleLogout} className="btn-secondary">
                 Sign Out
               </button>
@@ -114,6 +117,12 @@ export function Header() {
                   </svg>
                   New Task
                 </Link>
+                <Link href="/chat" className="mobile-link" onClick={closeMobileMenu}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  AI Chat
+                </Link>
                 <button onClick={handleLogout} className="mobile-link mobile-logout">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -155,7 +164,9 @@ export function Header() {
           padding: var(--spacing-md);
           position: sticky;
           top: 0;
-          z-index: 100;
+          z-index: var(--z-dropdown);
+          backdrop-filter: blur(8px);
+          background: rgba(255, 255, 255, 0.95);
         }
         .header-content {
           max-width: 1200px;
@@ -173,10 +184,11 @@ export function Header() {
           font-weight: var(--font-weight-bold);
           color: var(--primary);
           text-decoration: none;
-          transition: opacity var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .logo:hover {
-          opacity: 0.9;
+          opacity: 0.85;
+          transform: translateY(-1px);
         }
         .nav-desktop {
           display: none;
@@ -198,29 +210,37 @@ export function Header() {
         .user-email {
           color: var(--muted);
           font-size: var(--font-size-sm);
+          padding: var(--spacing-xs) var(--spacing-sm);
+          background: var(--bg-secondary);
+          border-radius: var(--radius-full);
         }
         .nav-link {
           color: var(--foreground);
           text-decoration: none;
           font-weight: var(--font-weight-medium);
+          font-size: var(--font-size-sm);
           padding: var(--spacing-sm) var(--spacing-md);
           border-radius: var(--radius-md);
-          transition: background var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .nav-link:hover {
           background: var(--bg-secondary);
+          color: var(--primary);
         }
         .btn-primary {
           background: var(--primary);
           color: white;
-          padding: var(--spacing-sm) var(--spacing-md);
+          padding: var(--spacing-sm) var(--spacing-lg);
           border-radius: var(--radius-md);
           text-decoration: none;
-          font-weight: var(--font-weight-medium);
-          transition: background var(--transition-fast);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-semibold);
+          transition: all var(--transition-fast) var(--ease-out-expo);
+          box-shadow: var(--shadow-button);
         }
         .btn-primary:hover {
           background: var(--primary-hover);
+          transform: translateY(-1px);
         }
         .btn-secondary {
           background: transparent;
@@ -231,51 +251,51 @@ export function Header() {
           font-size: var(--font-size-sm);
           font-weight: var(--font-weight-medium);
           cursor: pointer;
-          transition: background var(--transition-fast);
+          transition: all var(--transition-fast) var(--ease-out-expo);
         }
         .btn-secondary:hover {
           background: var(--bg-secondary);
+          border-color: var(--muted-light);
         }
         .mobile-menu-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: var(--spacing-sm);
+          width: 44px;
+          height: 44px;
+          padding: 0;
           background: none;
           border: none;
           cursor: pointer;
           color: var(--foreground);
           border-radius: var(--radius-md);
-          transition: background var(--transition-fast);
+          transition: all var(--transition-fast);
         }
         .mobile-menu-btn:hover {
           background: var(--bg-secondary);
         }
         .mobile-overlay {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 98;
-          animation: fadeIn 0.2s ease-out;
+          inset: 0;
+          background: rgba(0, 0, 0, var(--opacity-backdrop));
+          z-index: var(--z-modal-backdrop);
+          animation: fadeIn 200ms var(--ease-out-expo);
         }
         .nav-mobile {
           position: fixed;
           top: 0;
           right: 0;
           bottom: 0;
-          width: 280px;
-          max-width: 80vw;
+          width: 300px;
+          max-width: 85vw;
           background: var(--background);
-          z-index: 99;
+          z-index: var(--z-modal);
           padding: var(--spacing-xl);
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-sm);
-          animation: slideIn 0.2s ease-out;
-          box-shadow: var(--shadow-xl);
+          gap: var(--spacing-xs);
+          animation: slideIn 300ms var(--ease-out-expo);
+          box-shadow: var(--shadow-chat-panel);
         }
         @keyframes fadeIn {
           from {
@@ -299,21 +319,25 @@ export function Header() {
           gap: var(--spacing-sm);
           padding: var(--spacing-md);
           background: var(--bg-secondary);
-          border-radius: var(--radius-md);
-          color: var(--muted);
+          border-radius: var(--radius-lg);
+          color: var(--foreground);
           font-size: var(--font-size-sm);
           margin-bottom: var(--spacing-md);
+          border: 1px solid var(--border);
+        }
+        .mobile-user svg {
+          color: var(--primary);
         }
         .mobile-link {
           display: flex;
           align-items: center;
-          gap: var(--spacing-sm);
+          gap: var(--spacing-md);
           padding: var(--spacing-md);
           color: var(--foreground);
           text-decoration: none;
           font-weight: var(--font-weight-medium);
-          border-radius: var(--radius-md);
-          transition: background var(--transition-fast);
+          border-radius: var(--radius-lg);
+          transition: all var(--transition-fast) var(--ease-out-expo);
           border: none;
           background: none;
           cursor: pointer;
@@ -323,17 +347,35 @@ export function Header() {
         }
         .mobile-link:hover {
           background: var(--bg-secondary);
+          transform: translateX(4px);
+        }
+        .mobile-link svg {
+          color: var(--muted);
+          transition: color var(--transition-fast);
+        }
+        .mobile-link:hover svg {
+          color: var(--primary);
         }
         .mobile-logout {
           color: var(--error);
           margin-top: auto;
+          border-top: 1px solid var(--border);
+          padding-top: var(--spacing-lg);
+        }
+        .mobile-logout svg {
+          color: var(--error);
         }
         .mobile-signup {
           background: var(--primary);
           color: white;
+          margin-top: var(--spacing-sm);
         }
         .mobile-signup:hover {
           background: var(--primary-hover);
+          transform: translateX(0);
+        }
+        .mobile-signup svg {
+          color: white;
         }
       `}</style>
     </header>

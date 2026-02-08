@@ -3,7 +3,6 @@ import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { Header } from '@/components/layout/Header';
 import { ToastProvider } from '@/components/ui/Toast';
-import { ChatWidget } from '@/components/chat/ChatWidget';
 
 export const metadata: Metadata = {
   title: 'Todo App - Organize Your Tasks',
@@ -38,7 +37,6 @@ export default function RootLayout({
           <ToastProvider>
             <Header />
             {children}
-            <ChatWidget />
           </ToastProvider>
         </AuthProvider>
       </body>

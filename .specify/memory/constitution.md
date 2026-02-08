@@ -2,24 +2,31 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version Change: 0.0.0 → 1.0.0 (MAJOR - initial ratification)
+  Version Change: 1.0.0 → 2.0.0 (MAJOR - Phase 3 AI Chatbot integration)
 
-  Modified Principles: N/A (initial version)
+  Modified Principles:
+    - Accuracy: Extended for AI tool call reliability
+    - Reproducibility: Extended for tool call logging
+    - Security: Extended for AI/MCP context
 
   Added Sections:
-    - Core Principles (6 principles)
-    - Technology Constraints
-    - Development Workflow
-    - Governance
+    - Core Principles: VII. AI Reliability (new)
+    - Core Principles: VIII. Stateless Recovery (new)
+    - Technology Constraints: AI/Chatbot Stack (new)
+    - API Standards: Chat API endpoints (new)
+    - Data Entities: Conversation, Message (new)
+    - MCP Tool Specifications (new section)
 
-  Removed Sections: N/A (initial version)
+  Removed Sections: None
 
   Templates Requiring Updates:
     - .specify/templates/plan-template.md: ✅ Compatible (Constitution Check section exists)
     - .specify/templates/spec-template.md: ✅ Compatible (Requirements section aligns)
-    - .specify/templates/tasks-template.md: ✅ Compatible (Phase structure supports auth/security tasks)
+    - .specify/templates/tasks-template.md: ✅ Compatible (Phase structure supports AI/MCP tasks)
 
-  Follow-up TODOs: None
+  Follow-up TODOs:
+    - Create Phase 3 feature spec in specs/phase3-chatbot/
+    - Update plan template for AI integration patterns
   ============================================================================
 -->
 
@@ -92,6 +99,37 @@ premature optimization, and speculative features.
 - YAGNI (You Aren't Gonna Need It) principle strictly enforced
 - No third-party hosted auth services (custom JWT implementation required)
 
+### VII. AI Reliability
+
+The AI chatbot MUST perform task operations reliably via MCP tools. Every tool call
+MUST map to a user message and execute the correct operation. Chatbot responses MUST
+be friendly, clear, and informative.
+
+**Rationale**: Users trust the AI assistant to correctly interpret intent and execute
+actions. Reliability builds confidence in the system.
+
+**Non-negotiables**:
+- All tool calls MUST be mapped to user messages according to agent behavior specification
+- Tool execution MUST succeed or provide clear, actionable error messages
+- Chatbot responses MUST accurately reflect the operation performed
+- No hallucinated actions (claiming to do something that wasn't done)
+- MCP tools are the ONLY mechanism for task CRUD operations via chat
+
+### VIII. Stateless Recovery
+
+The backend MUST remain stateless. All conversation context MUST be stored in the
+database and recoverable from storage alone. No in-memory session state is permitted.
+
+**Rationale**: Stateless backends enable horizontal scaling, resilience to restarts,
+and deterministic behavior across requests.
+
+**Non-negotiables**:
+- Conversation history MUST be persisted to database
+- All tool calls MUST be logged in database for auditability
+- Server restart MUST NOT lose any conversation context
+- Each request MUST be independently verifiable from stored state
+- No reliance on in-memory caches for correctness (cache for performance only)
+
 ## Technology Constraints
 
 ### Frontend Stack
@@ -107,11 +145,19 @@ premature optimization, and speculative features.
 - **Authentication**: Custom JWT-based implementation
 - **Prohibited**: Better Auth or third-party hosted auth services
 
+### AI/Chatbot Stack (Phase 3)
+- **Agent Framework**: OpenAI Agents SDK
+- **Tool Protocol**: Model Context Protocol (MCP)
+- **Chat UI**: React/Next.js ChatKit component (floating button UX)
+- **LLM Provider**: OpenAI (GPT-4 or equivalent)
+- **Conversation Storage**: PostgreSQL via SQLModel
+- **Domain Allowlist**: Configured for ChatKit frontend security
+
 ### API Standards
 All endpoints MUST require authentication. All task operations MUST be scoped to the
 authenticated user.
 
-**Required Endpoints**:
+**Required Endpoints (Phase 1-2)**:
 ```
 POST   /api/auth/signup          # User registration
 POST   /api/auth/signin          # User login (returns JWT)
@@ -123,9 +169,49 @@ DELETE /api/{user_id}/tasks/{id} # Delete task
 PATCH  /api/{user_id}/tasks/{id}/complete # Mark complete
 ```
 
+**Required Endpoints (Phase 3 - Chat API)**:
+```
+POST   /api/chat                 # Send message, receive AI response (JWT secured)
+GET    /api/chat/history         # Retrieve conversation history (JWT secured)
+DELETE /api/chat/history         # Clear conversation history (JWT secured)
+```
+
 ### Data Entities
+
+**Core Entities (Phase 1-2)**:
 - **User**: id, email, hashed_password, created_at
 - **Task**: id, user_id (FK), title, description, completed, created_at, updated_at
+
+**Chat Entities (Phase 3)**:
+- **Conversation**: id, user_id (FK), created_at, updated_at
+- **Message**: id, conversation_id (FK), role (user|assistant|tool), content, tool_call_id (nullable), tool_name (nullable), created_at
+
+### MCP Tool Specifications (Phase 3)
+
+The AI chatbot MUST use MCP tools for all task operations. Tool calls are the bridge
+between natural language and database operations.
+
+**Required MCP Tools**:
+```
+add_task(title, description?)     # Create a new task for the user
+list_tasks(filter?)               # List user's tasks (optional: completed/pending filter)
+complete_task(task_id)            # Mark a task as completed
+delete_task(task_id)              # Remove a task permanently
+update_task(task_id, title?, description?, completed?)  # Modify task properties
+```
+
+**Tool Behavior Contract**:
+- Every tool MUST validate user ownership before execution
+- Every tool MUST return structured success/error responses
+- Every tool call MUST be logged in the Message table with role="tool"
+- Tool errors MUST be user-friendly and actionable
+- Tools MUST NOT perform operations on tasks owned by other users
+
+**Integration Requirements**:
+- MCP server runs as part of the FastAPI backend
+- OpenAI Agents SDK orchestrates tool selection and execution
+- All tool calls are scoped to the authenticated user's context
+- Tool results are formatted for natural language response generation
 
 ## Development Workflow
 
@@ -168,4 +254,4 @@ PATCH  /api/{user_id}/tasks/{id}/complete # Mark complete
 - Security violations are blocking and non-negotiable
 - User isolation violations are critical defects
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-13 | **Last Amended**: 2026-01-13
+**Version**: 2.0.0 | **Ratified**: 2026-01-13 | **Last Amended**: 2026-01-20
